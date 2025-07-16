@@ -1,0 +1,28 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: "ms_customer_stats"
+  profiles:
+    include: "dev-local"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
+aws:
+  region: "us-east-1"
+  dynamodb:
+    endpoint: "http://localhost:8000"
+
+rabbit:
+  port: 5672
+  host: "localhost"
+  username: "guest"
+  password: "guest"
