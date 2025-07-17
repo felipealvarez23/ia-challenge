@@ -1,0 +1,28 @@
+# Nombre del flujo de trabajo que aparecerá en la pestaña "Actions" de GitHub
+name: Build, Test and Analyze
+
+# Define cuándo se debe ejecutar este flujo de trabajo
+on:
+  push:
+    branches: [ trunk ] # Se ejecuta en cada push a la rama trunk
+  pull_request:
+    branches: [ trunk ] # También se ejecuta en los pull requests hacia trunk
+
+jobs:
+  build-and-analyze:
+    name: Build, Test and Analyze
+    # Se ejecutará en una máquina virtual de Ubuntu proporcionada por GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clona tu repositorio en la máquina virtual
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Deshabilita el clonado superficial para un mejor análisis de Sonar
+
+      # 2. Configura el entorno de Java 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
