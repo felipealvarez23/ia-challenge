@@ -1,28 +1,28 @@
-Microservicio de Estadísticas de Clientes (ms-customer-stats)
+## Microservicio de Estadísticas de Clientes (ms-customer-stats)
 Este proyecto es la solución a la prueba técnica para Desarrollador Java (Nivel Middle/Senior) de Muebles SAS. El objetivo es construir un microservicio reactivo encargado de recibir, validar y procesar estadísticas de interacción con usuarios.
 
-📋 Tecnologías Utilizadas
-Java 17
+### 📋 Tecnologías Utilizadas
+- Java 17
 
-Spring Boot 3 con Spring WebFlux (Programación Reactiva)
+- Spring Boot 3 con Spring WebFlux (Programación Reactiva)
 
-Project Reactor
+- Project Reactor
 
-Gradle como gestor de dependencias
+- Gradle como gestor de dependencias
 
-Lombok para la reducción de código boilerplate
+- Lombok para la reducción de código boilerplate
 
-MapStruct para el mapeo eficiente entre DTOs y modelos de dominio
+- MapStruct para el mapeo eficiente entre DTOs y modelos de dominio
 
-DynamoDB como base de datos NoSQL
+- DynamoDB como base de datos NoSQL
 
-RabbitMQ como broker de mensajería para eventos
+- RabbitMQ como broker de mensajería para eventos
 
-Docker & Docker Compose para la gestión del entorno local
+- Docker & Docker Compose para la gestión del entorno local
 
-JUnit 5 para pruebas unitarias y de integración
+- JUnit 5 para pruebas unitarias y de integración
 
-🏛️ Arquitectura
+### 🏛️ Arquitectura
 El proyecto está construido siguiendo los principios de Clean Architecture, separando claramente las responsabilidades en las siguientes capas:
 
 Domain: Contiene los modelos y reglas de negocio puros.
@@ -33,7 +33,7 @@ Entry Points: Expone la funcionalidad al exterior (API REST).
 
 Driven Adapters: Implementa la comunicación con tecnologías externas (DynamoDB, RabbitMQ).
 
-🚀 Puesta en Marcha
+### 🚀 Puesta en Marcha
 Sigue estos pasos para levantar y ejecutar el proyecto en tu entorno local.
 
 Prerrequisitos
@@ -80,7 +80,7 @@ El servicio expone un único endpoint para procesar las estadísticas.
 
 Endpoint: POST /api/customer-stats
 
-✅ Ejemplo de Petición Exitosa
+### ✅ Ejemplo de Petición Exitosa
 Para que la petición sea exitosa, el hash debe ser el MD5 correcto de los valores numéricos concatenados.
 
 curl --location --request POST 'http://localhost:8080/api/customer-stats' \
