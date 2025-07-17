@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # Servicio de la aplicación Java
+  ms-customer-stats-app:
+    build:
+      context: ./deployment # El contexto es el directorio actual (ms-customer-stats)
+      dockerfile: Dockerfile # El nombre del Dockerfile a usar
+    container_name: ms-customer-stats-app
+    ports:
+      - "8080:8080" # Mapea el puerto de la app a tu máquina local
+    networks:
+      - ms-network
+    depends_on:
+      - dynamodb-setup # Se asegura de que la tabla exista antes de iniciar la app
+      - rabbitmq
+
+  # Servicio de base de datos NoSQL
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    # El puerto se expone para poder depurar con herramientas como NoSQL Workbench
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+    networks:
+      - ms-network
+
+  # Nuevo servicio para crear la tabla de DynamoDB automáticamente, sin script externo
+  dynamodb-setup:
+    image: amazon/aws-cli
+    container_name: dynamodb-setup
+    networks:
+      - ms-network
+    depends_on:
+      - dynamodb-local # Depende del servicio de DynamoDB
+    # El comando se ejecuta directamente aquí, usando un bloque literal de YAML
+    command: >
+      sh -c "
+        echo 'Esperando a que DynamoDB esté disponible...';
+        until aws dynamodb list-tables --endpoint-url http://dynamodb-local:8000 > /dev/null 2>&1; do
+          sleep 1;
+        done;
+      
+        echo 'DynamoDB está listo. Creando la tabla si no existe.';
+        if ! aws dynamodb describe-table --table-name customer_stats --endpoint-url http://dynamodb-local:8000 > /dev/null 2>&1; then
+          aws dynamodb create-table \
+            --table-name customer_stats \
+            --attribute-definitions AttributeName=timestamp,AttributeType=S \
+            --key-schema AttributeName=timestamp,KeyType=HASH \
+            --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+            --endpoint-url http://dynamodb-local:8000;
+          echo 'Tabla customer_stats creada.';
+        else
+          echo 'La tabla customer_stats ya existe.';
+        fi
+      "
+
+  # Servicio de mensajería
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - ms-network
+
+# Definición de los volúmenes
+volumes:
+  dynamodb_data:
+  rabbitmq_data:
+
+# Definición de la red
+networks:
+  ms-network:
+    driver: bridge
