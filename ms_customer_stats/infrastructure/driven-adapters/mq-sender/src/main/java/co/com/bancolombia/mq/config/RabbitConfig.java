@@ -13,17 +13,18 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class RabbitConfig {
 
-    @Value("${rabbit.username}")
-    private String username;
+    private final String username;
+    private final String password;
+    private final String host;
+    private final int port;
 
-    @Value("${rabbit.password}")
-    private String password;
-
-    @Value("${rabbit.host}")
-    private String host;
-
-    @Value("${rabbit.port}")
-    private int port;
+    public RabbitConfig(@Value("${rabbit.username}") String username, @Value("${rabbit.password}") String password,
+                        @Value("${rabbit.host}") String host, @Value("${rabbit.port}") int port) {
+        this.username = username;
+        this.password = password;
+        this.host = host;
+        this.port = port;
+    }
 
     @Bean
     @Primary

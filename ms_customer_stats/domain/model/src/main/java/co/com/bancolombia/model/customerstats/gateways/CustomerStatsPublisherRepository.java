@@ -4,5 +4,5 @@ import co.com.bancolombia.model.customerstats.CustomerStats;
 import reactor.core.publisher.Mono;
 
 public interface CustomerStatsPublisherRepository {
-    Mono<Void> publishValidStats(CustomerStats customerStats);
+    Mono<CustomerStats> publishValidStats(CustomerStats customerStats);
 }

@@ -18,15 +18,13 @@ public class DynamoDBConfig {
     @Bean
     @Profile({"dev-local"})
     public DynamoDbAsyncClient amazonDynamoDB(@Value("${aws.dynamodb.endpoint}") String endpoint,
-                                              @Value("${aws.region}") String region,
-                                              MetricPublisher publisher) {
+                                              @Value("${aws.region}") String region) {
         AwsBasicCredentials basicCredentials = AwsBasicCredentials
                 .create( "fakeAccessKeyId", "fakeSecretAccessKey" );
         return DynamoDbAsyncClient.builder()
                 .credentialsProvider(StaticCredentialsProvider.create(basicCredentials))
                 .region(Region.of(region))
                 .endpointOverride(URI.create(endpoint))
-                .overrideConfiguration(o -> o.addMetricPublisher(publisher))
                 .build();
     }
 

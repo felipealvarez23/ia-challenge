@@ -100,6 +100,19 @@ tasks.register('jacocoMergedReport', JacocoReport) {
         csv.setRequired false
         html.setRequired true
     }
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: [
+                '**/bancolombia/MainApplication**',
+                '**/bancolombia/helper/**',
+                '**/bancolombia/**/helper/**',
+                '**/bancolombia/config/**',
+                '**/bancolombia/**/config/**',
+                '**/bancolombia/**/mapper/**',
+                '**/bancolombia/model/**',
+                '**/bancolombia/**/model/**',
+                '**/error/**'
+        ],)
+    }))
 }
 
 tasks.withType(JavaCompile).configureEach {

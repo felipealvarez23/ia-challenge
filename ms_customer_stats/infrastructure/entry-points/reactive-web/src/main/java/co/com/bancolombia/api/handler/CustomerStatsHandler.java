@@ -2,9 +2,12 @@ package co.com.bancolombia.api.handler;
 
 import co.com.bancolombia.api.mapper.CustomerStatsMapper;
 import co.com.bancolombia.api.model.processcustomerstats.request.CustomerStatsRequest;
-import co.com.bancolombia.model.exception.InvalidHashException;
+import co.com.bancolombia.api.model.processcustomerstats.response.CustomerStatsResponse;
+import co.com.bancolombia.api.model.processcustomerstats.response.ErrorResponse;
+import co.com.bancolombia.model.exception.CustomerStatsException;
 import co.com.bancolombia.usecase.processcustomerstats.ProcessCustomerStatsUseCase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -22,8 +25,17 @@ public class CustomerStatsHandler {
                 .map(customerStatsMapper::toDomain)
                 .flatMap(processCustomerStatsUseCase::process)
                 .then(ServerResponse.ok().build())
-                .onErrorResume(InvalidHashException.class,
-                        ex -> ServerResponse.badRequest().build());
+                .onErrorResume(CustomerStatsException.class, this::buildErrorResponse);
+    }
+
+    private Mono<ServerResponse> buildErrorResponse(CustomerStatsException ex) {
+        return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(CustomerStatsResponse.builder()
+                        .error(ErrorResponse.builder()
+                                .message(ex.getMessage())
+                                .technicalMessage(ex.getTechnicalMessage())
+                                .build())
+                        .build()), CustomerStatsResponse.class);
     }
 
 }

@@ -4,19 +4,21 @@ import co.com.bancolombia.dynamodb.helper.TemplateAdapterOperations;
 import co.com.bancolombia.dynamodb.model.customerstats.CustomerStatsData;
 import co.com.bancolombia.model.customerstats.CustomerStats;
 import co.com.bancolombia.model.customerstats.gateways.CustomerStatsRepository;
+import co.com.bancolombia.model.exception.CustomerStatsException;
 import org.reactivecommons.utils.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
-import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 
-import java.util.List;
+import static co.com.bancolombia.model.constants.ExceptionMessage.DEFAULT_ERROR_MESSAGE;
 
 
 @Repository
 public class CustomerStatsAdapter extends TemplateAdapterOperations<CustomerStats, String, CustomerStatsData> implements CustomerStatsRepository {
+
+    private final static Logger logger = LoggerFactory.getLogger(CustomerStatsAdapter.class);
 
     public CustomerStatsAdapter(DynamoDbEnhancedAsyncClient connectionFactory, ObjectMapper mapper) {
         /**
@@ -30,7 +32,10 @@ public class CustomerStatsAdapter extends TemplateAdapterOperations<CustomerStat
     @Override
     public Mono<CustomerStats> saveStats(CustomerStats customerStats) {
         customerStats.setTimestamp(String.valueOf(System.currentTimeMillis()));
-        return save(customerStats);
+        return save(customerStats)
+                .doOnError(error -> logger.error(DEFAULT_ERROR_MESSAGE,error))
+                .onErrorResume(error ->
+                        Mono.error(() -> new CustomerStatsException(DEFAULT_ERROR_MESSAGE, error.getMessage())));
     }
 
 }

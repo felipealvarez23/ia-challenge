@@ -13,8 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class DynamoDBConfigTest {
 
-    @Mock
-    private MetricPublisher publisher;
 
     @Mock
     private DynamoDbAsyncClient dynamoDbAsyncClient;
@@ -26,8 +24,7 @@ class DynamoDBConfigTest {
 
         DynamoDbAsyncClient result = dynamoDBConfig.amazonDynamoDB(
                 "http://aws.dynamo.test",
-                "region",
-                publisher);
+                "region");
 
         assertNotNull(result);
     }
@@ -36,7 +33,7 @@ class DynamoDBConfigTest {
     void testAmazonDynamoDBAsync() {
 
         DynamoDbAsyncClient result = dynamoDBConfig.amazonDynamoDBAsync(
-                publisher,
+                null,
                 "region");
 
         assertNotNull(result);

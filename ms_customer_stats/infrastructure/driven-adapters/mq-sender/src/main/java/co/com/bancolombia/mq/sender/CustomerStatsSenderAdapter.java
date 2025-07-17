@@ -6,21 +6,28 @@ import lombok.RequiredArgsConstructor;
 import org.reactivecommons.api.domain.DomainEvent;
 import org.reactivecommons.api.domain.DomainEventBus;
 import org.reactivecommons.async.impl.config.annotations.EnableDomainEventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+
+import static co.com.bancolombia.model.constants.ExceptionMessage.DEFAULT_ERROR_MESSAGE;
 
 @Service
 @EnableDomainEventBus
 @RequiredArgsConstructor
 public class CustomerStatsSenderAdapter implements CustomerStatsPublisherRepository {
 
+    private static final Logger logger = LoggerFactory.getLogger(CustomerStatsSenderAdapter.class);
+
     private final DomainEventBus eventBus;
 
     @Override
-    public Mono<Void> publishValidStats(CustomerStats customerStats) {
+    public Mono<CustomerStats> publishValidStats(CustomerStats customerStats) {
         return Mono.from(eventBus.emit(new DomainEvent<>("event.stats.validated", UUID.randomUUID().toString(), customerStats)))
-                .doOnError(e-> System.out.println(e.getMessage()));
+                .thenReturn(customerStats)
+                .doOnError(e-> logger.error(DEFAULT_ERROR_MESSAGE, e));
     }
 }
