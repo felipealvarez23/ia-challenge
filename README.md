@@ -1,56 +1,31 @@
 ## Microservicio de Estadísticas de Clientes (ms-customer-stats)
-Este proyecto es la solución a la prueba técnica para Desarrollador Java (Nivel Middle/Senior) de Muebles SAS. El objetivo es construir un microservicio reactivo encargado de recibir, validar y procesar estadísticas de interacción con usuarios.
+### Introducción
+Este monorepositorio  contiene la solución al reto técnico para Desarrollador Java (Middle/Senior) de Bancolombia. El reto plantea un escenario ficticio donde la empresa Muebles SAS busca modernizar su arquitectura a través de un ecosistema de microservicios para potenciar la experiencia de sus clientes.
 
-### 📋 Tecnologías Utilizadas
-- Java 17
+El reto propone la implementación de un microservicio el cual actúa como el punto de entrada principal para las estadísticas de interacción con usuarios. Su responsabilidad es recibir, validar y procesar estos datos de forma reactiva y asíncrona. La integridad de los datos se asegura mediante la validación de un hash MD5.
 
-- Spring Boot 3 con Spring WebFlux (Programación Reactiva)
+La solución emplea un stack tecnológico moderno, incluyendo Spring WebFlux para la gestión de peticiones no bloqueantes, DynamoDB para la persistencia NoSQL y RabbitMQ para la publicación de eventos. El diseño se adhiere estrictamente a los principios de Clean Architecture, lo que resulta en un código desacoplado, mantenible y altamente escalable.
 
-- Project Reactor
+###  Prerequisitos
+- Java 17 o superior
+- Docker y Docker Compose
+- AWS CLI instalado y configurado
 
-- Gradle como gestor de dependencias
+###  Ejecución ambiente local
+Se deben ejecutar los siguiente pasos para levantar el proyecto en el  ambiente local.
 
-- Lombok para la reducción de código boilerplate
-
-- MapStruct para el mapeo eficiente entre DTOs y modelos de dominio
-
-- DynamoDB como base de datos NoSQL
-
-- RabbitMQ como broker de mensajería para eventos
-
-- Docker & Docker Compose para la gestión del entorno local
-
-- JUnit 5 para pruebas unitarias y de integración
-
-### 🏛️ Arquitectura
-El proyecto está construido siguiendo los principios de Clean Architecture, separando claramente las responsabilidades en las siguientes capas:
-
-Domain: Contiene los modelos y reglas de negocio puros.
-
-Use Cases: Orquesta los flujos de la aplicación.
-
-Entry Points: Expone la funcionalidad al exterior (API REST).
-
-Driven Adapters: Implementa la comunicación con tecnologías externas (DynamoDB, RabbitMQ).
-
-### 🚀 Puesta en Marcha
-Sigue estos pasos para levantar y ejecutar el proyecto en tu entorno local.
-
-Prerrequisitos
-Java 17 o superior
-
-Docker y Docker Compose
-
-AWS CLI instalado y configurado (puedes usar credenciales falsas como se explica aquí)
-
-1. Clonar el Repositorio
-git clone <URL_DEL_REPOSITORIO>
+1. Clonar el Repositorio y navegar al folder del microservicio
+```
+git clone https://github.com/felipealvarez23/ia-challenge.git -b trunk
 cd ms-customer-stats
+```
 
 2. Levantar el Entorno con Docker Compose
 Este comando iniciará los contenedores de DynamoDB y RabbitMQ.
 
+```
 docker-compose up -d
+```
 
 Puedes verificar que los servicios están corriendo con docker-compose ps.
 
@@ -61,28 +36,48 @@ RabbitMQ Management estará disponible en http://localhost:15672 (user: guest, p
 3. Crear la Tabla en DynamoDB
 Ejecuta el siguiente comando para crear la tabla customer_stats en tu instancia local de DynamoDB.
 
+```
 aws dynamodb create-table \
     --table-name customer_stats \
     --attribute-definitions AttributeName=timestamp,AttributeType=S \
     --key-schema AttributeName=timestamp,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
     --endpoint-url http://localhost:8000
+```
 
 4. Ejecutar la Aplicación
 Finalmente, puedes ejecutar el microservicio usando el wrapper de Gradle.
 
+```
 ./gradlew bootRun
+```
 
 La aplicación estará disponible en http://localhost:8080.
 
-⚙️ Uso de la API
+### Uso de la API
 El servicio expone un único endpoint para procesar las estadísticas.
 
-Endpoint: POST /api/customer-stats
+Endpoint: POST /api/stats
 
-### ✅ Ejemplo de Petición Exitosa
+```json
+{
+ "totalContactoClientes": 250,
+ "motivoReclamo": 25,
+ "motivoGarantia": 10,
+ "motivoDuda": 100,
+ "motivoCompra": 100,
+ "motivoFelicitaciones": 7,
+ "motivoCambio": 8,
+ "hash": "02946f262f2eb0d8d5c8e76c50433ed8"
+}
+```
+
+
+
+### Ejemplo de Petición Exitosa
 Para que la petición sea exitosa, el hash debe ser el MD5 correcto de los valores numéricos concatenados.
 
+```
 curl --location --request POST 'http://localhost:8080/api/customer-stats' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -95,10 +90,12 @@ curl --location --request POST 'http://localhost:8080/api/customer-stats' \
     "motivoCambio": 8,
     "hash": "5484062a4be1ce5645eb414663e14f59"
 }'
+```
 
-Respuesta esperada: 200 OK
+##### Respuesta esperada: 200 OK
 
-❌ Ejemplo de Petición con Hash Inválido
+Ejemplo de Petición con Hash Inválido
+```
 curl --location --request POST 'http://localhost:8080/api/customer-stats' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -111,12 +108,24 @@ curl --location --request POST 'http://localhost:8080/api/customer-stats' \
     "motivoCambio": 8,
     "hash": "hash_incorrecto"
 }'
+```
 
-Respuesta esperada: 400 Bad Request
+##### Respuesta esperada: 400 Bad Request
 
-🧪 Ejecución de Pruebas
+```json
+{
+    "error": {
+        "message": "Something went wrong. Please try again.",
+        "technicalMessage": "Invalid hash: hash_incorrecto"
+    }
+}
+```
+
+### Ejecución de Pruebas
 Para ejecutar el conjunto completo de pruebas (unitarias y de integración), utiliza el siguiente comando de Gradle:
 
-./gradlew test
+```
+./gradlew clean build jacocoMergedReport
+```
 
 El reporte de cobertura de las pruebas se puede encontrar en build/reports/jacoco/test/html/index.html.
