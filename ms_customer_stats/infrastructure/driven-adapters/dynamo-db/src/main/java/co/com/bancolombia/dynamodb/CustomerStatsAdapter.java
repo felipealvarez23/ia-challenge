@@ -35,7 +35,7 @@ public class CustomerStatsAdapter extends TemplateAdapterOperations<CustomerStat
         return save(customerStats)
                 .doOnSuccess(stats -> logger.info("Customer stats saved on Dynamodb successfully. Timestamp: {}",
                         customerStats.getTimestamp()))
-                .doOnError(error -> logger.error(DEFAULT_ERROR_MESSAGE,error))
+                .doOnError(error -> logger.error("Error saving customer stats on Dynamodb: ",error))
                 .onErrorResume(error ->
                         Mono.error(() -> new CustomerStatsException(DEFAULT_ERROR_MESSAGE, error.getMessage())));
     }

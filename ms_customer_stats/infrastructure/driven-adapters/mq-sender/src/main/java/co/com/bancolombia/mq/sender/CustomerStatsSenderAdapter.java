@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-import static co.com.bancolombia.model.constants.ExceptionMessage.DEFAULT_ERROR_MESSAGE;
 
 @Service
 @EnableDomainEventBus
@@ -30,6 +29,6 @@ public class CustomerStatsSenderAdapter implements CustomerStatsPublisherReposit
                 .doOnSuccess(stats -> logger.info("Customer stats published on RabbitMQ successfully. Timestamp: {}",
                         customerStats.getTimestamp()))
                 .thenReturn(customerStats)
-                .doOnError(e-> logger.error(DEFAULT_ERROR_MESSAGE, e));
+                .doOnError(e-> logger.error("Error publishing customer stats event on RabbitMQ", e));
     }
 }

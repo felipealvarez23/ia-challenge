@@ -7,6 +7,8 @@ import co.com.bancolombia.api.model.processcustomerstats.response.CustomerStatsR
 import co.com.bancolombia.api.model.processcustomerstats.response.ErrorResponse;
 import co.com.bancolombia.model.exception.CustomerStatsException;
 import co.com.bancolombia.usecase.processcustomerstats.ProcessCustomerStatsUseCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,7 @@ public class CustomerStatsHandler extends AbstractValidationHandler<CustomerStat
 
     private final ProcessCustomerStatsUseCase processCustomerStatsUseCase;
     private final CustomerStatsMapper customerStatsMapper;
+    private static final Logger logger = LoggerFactory.getLogger(CustomerStatsHandler.class);
 
     public CustomerStatsHandler(@Autowired Validator validator,
                                 CustomerStatsMapper customerStatsMapper,
@@ -31,13 +34,14 @@ public class CustomerStatsHandler extends AbstractValidationHandler<CustomerStat
         this.processCustomerStatsUseCase = processCustomerStatsUseCase;
     }
 
-//    public Mono<ServerResponse> processCustomerStats(ServerRequest serverRequest) {
-//        return serverRequest.bodyToMono(CustomerStatsRequest.class)
-//                .map(customerStatsMapper::toDomain)
-//                .flatMap(processCustomerStatsUseCase::process)
-//                .then(ServerResponse.ok().build())
-//                .onErrorResume(CustomerStatsException.class, this::buildErrorResponse);
-//    }
+    @Override
+    protected Mono<ServerResponse> processBody(CustomerStatsRequest validBody, ServerRequest originalRequest) {
+        logger.info("CustomerStatsHandler processBody started: {}",validBody);
+        return Mono.just(customerStatsMapper.toDomain(validBody))
+                .flatMap(processCustomerStatsUseCase::process)
+                .then(ServerResponse.ok().build())
+                .onErrorResume(CustomerStatsException.class, this::buildErrorResponse);
+    }
 
     private Mono<ServerResponse> buildErrorResponse(CustomerStatsException ex) {
         return ServerResponse.badRequest().contentType(MediaType.APPLICATION_JSON)
@@ -47,14 +51,6 @@ public class CustomerStatsHandler extends AbstractValidationHandler<CustomerStat
                                 .technicalMessage(ex.getTechnicalMessage())
                                 .build())
                         .build()), CustomerStatsResponse.class);
-    }
-
-    @Override
-    protected Mono<ServerResponse> processBody(CustomerStatsRequest validBody, ServerRequest originalRequest) {
-        return Mono.just(customerStatsMapper.toDomain(validBody))
-                .flatMap(processCustomerStatsUseCase::process)
-                .then(ServerResponse.ok().build())
-                .onErrorResume(CustomerStatsException.class, this::buildErrorResponse);
     }
 
     @Override

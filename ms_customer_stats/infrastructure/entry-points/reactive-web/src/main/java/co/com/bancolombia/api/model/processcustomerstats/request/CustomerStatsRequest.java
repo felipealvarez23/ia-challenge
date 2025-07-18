@@ -3,8 +3,7 @@ package co.com.bancolombia.api.model.processcustomerstats.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
