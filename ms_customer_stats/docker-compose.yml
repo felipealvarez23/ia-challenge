@@ -3,6 +3,7 @@ version: '3.8'
 services:
   # Servicio de la aplicación Java
   ms-customer-stats-app:
+    image: ms-customer-stats:1.0
     build:
       context: ./deployment # El contexto es el directorio actual (ms-customer-stats)
       dockerfile: Dockerfile # El nombre del Dockerfile a usar
