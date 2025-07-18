@@ -4,8 +4,6 @@ Este monorepositorio  contiene la solución al reto técnico para Desarrollador 
 
 El reto propone la implementación de un microservicio el cual actúa como el punto de entrada principal para las estadísticas de interacción con usuarios. Su responsabilidad es recibir, validar y procesar estos datos de forma reactiva y asíncrona. La integridad de los datos se asegura mediante la validación de un hash MD5.
 
-La solución emplea un stack tecnológico moderno, incluyendo Spring WebFlux para la gestión de peticiones no bloqueantes, DynamoDB para la persistencia NoSQL y RabbitMQ para la publicación de eventos. El diseño se adhiere estrictamente a los principios de Clean Architecture, lo que resulta en un código desacoplado, mantenible y altamente escalable.
-
 ###  Prerequisitos
 - Java 17 o superior
 - Docker y Docker Compose
@@ -54,14 +52,30 @@ Finalmente, puedes ejecutar el microservicio usando el wrapper de Gradle.
 
 La aplicación estará disponible en http://localhost:8080.
 
-⚙️ Uso de la API
+### Uso de la API
 El servicio expone un único endpoint para procesar las estadísticas.
 
-Endpoint: POST /api/customer-stats
+Endpoint: POST /api/stats
 
-### ✅ Ejemplo de Petición Exitosa
+```json
+{
+ "totalContactoClientes": 250,
+ "motivoReclamo": 25,
+ "motivoGarantia": 10,
+ "motivoDuda": 100,
+ "motivoCompra": 100,
+ "motivoFelicitaciones": 7,
+ "motivoCambio": 8,
+ "hash": "02946f262f2eb0d8d5c8e76c50433ed8"
+}
+```
+
+
+
+### Ejemplo de Petición Exitosa
 Para que la petición sea exitosa, el hash debe ser el MD5 correcto de los valores numéricos concatenados.
 
+```
 curl --location --request POST 'http://localhost:8080/api/customer-stats' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -74,10 +88,12 @@ curl --location --request POST 'http://localhost:8080/api/customer-stats' \
     "motivoCambio": 8,
     "hash": "5484062a4be1ce5645eb414663e14f59"
 }'
+```
 
-Respuesta esperada: 200 OK
+##### Respuesta esperada: 200 OK
 
-❌ Ejemplo de Petición con Hash Inválido
+Ejemplo de Petición con Hash Inválido
+```
 curl --location --request POST 'http://localhost:8080/api/customer-stats' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -90,12 +106,15 @@ curl --location --request POST 'http://localhost:8080/api/customer-stats' \
     "motivoCambio": 8,
     "hash": "hash_incorrecto"
 }'
+```
 
-Respuesta esperada: 400 Bad Request
+##### Respuesta esperada: 400 Bad Request
 
-🧪 Ejecución de Pruebas
+### Ejecución de Pruebas
 Para ejecutar el conjunto completo de pruebas (unitarias y de integración), utiliza el siguiente comando de Gradle:
 
+```
 ./gradlew clean build jacocoMergedReport
+```
 
 El reporte de cobertura de las pruebas se puede encontrar en build/reports/jacoco/test/html/index.html.
