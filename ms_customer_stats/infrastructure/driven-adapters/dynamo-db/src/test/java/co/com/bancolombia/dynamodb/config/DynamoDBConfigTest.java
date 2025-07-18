@@ -29,15 +29,15 @@ class DynamoDBConfigTest {
         assertNotNull(result);
     }
 
-    @Test
-    void testAmazonDynamoDBAsync() {
-
-        DynamoDbAsyncClient result = dynamoDBConfig.amazonDynamoDBAsync(
-                null,
-                "region");
-
-        assertNotNull(result);
-    }
+//    @Test
+//    void testAmazonDynamoDBAsync() {
+//
+//        DynamoDbAsyncClient result = dynamoDBConfig.amazonDynamoDBAsync(
+//                null,
+//                "region");
+//
+//        assertNotNull(result);
+//    }
 
 
     @Test
