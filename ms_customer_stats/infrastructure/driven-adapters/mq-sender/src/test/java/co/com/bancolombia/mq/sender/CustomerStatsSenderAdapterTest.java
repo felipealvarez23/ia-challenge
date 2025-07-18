@@ -28,7 +28,7 @@ class CustomerStatsSenderAdapterTest {
     @DisplayName("should return custom stats")
     void publishValidStats() {
         var customerStats = new CustomerStats();
-        when(eventBus.emit(any(DomainEvent.class))).thenReturn(Mono.just(""));
+        when(eventBus.emit(any(DomainEvent.class))).thenReturn(Mono.empty());
         Mono<CustomerStats> publishMono = adapter.publishValidStats(customerStats);
         StepVerifier.create(publishMono).expectNextCount(1).verifyComplete();
     }

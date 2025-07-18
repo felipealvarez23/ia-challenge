@@ -13,6 +13,6 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class RouterRest {
     @Bean
     public RouterFunction<ServerResponse> routerFunction(CustomerStatsHandler handler) {
-        return route(POST("/api/customer-stats"), handler::processCustomerStats);
+        return route(POST("/api/stats"), handler::handleRequest);
     }
 }

@@ -27,6 +27,8 @@ public class CustomerStatsSenderAdapter implements CustomerStatsPublisherReposit
     @Override
     public Mono<CustomerStats> publishValidStats(CustomerStats customerStats) {
         return Mono.from(eventBus.emit(new DomainEvent<>("event.stats.validated", UUID.randomUUID().toString(), customerStats)))
+                .doOnSuccess(stats -> logger.info("Customer stats published on RabbitMQ successfully. Timestamp: {}",
+                        customerStats.getTimestamp()))
                 .thenReturn(customerStats)
                 .doOnError(e-> logger.error(DEFAULT_ERROR_MESSAGE, e));
     }

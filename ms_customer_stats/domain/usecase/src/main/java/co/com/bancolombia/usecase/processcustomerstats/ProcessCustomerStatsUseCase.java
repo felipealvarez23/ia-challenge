@@ -18,9 +18,8 @@ public class ProcessCustomerStatsUseCase {
 
     public Mono<Void> process(CustomerStats customerStats) {
         return validateHash(customerStats)
-                .then(Mono.defer(()-> Mono.zip(
-                        customerStatsRepository.saveStats(customerStats),
-                        statsPublisherRepository.publishValidStats(customerStats))))
+                .then(Mono.defer(()-> customerStatsRepository.saveStats(customerStats)))
+                .flatMap(statsPublisherRepository::publishValidStats)
                 .then();
     }
 
