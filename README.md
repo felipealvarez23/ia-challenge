@@ -4,6 +4,8 @@ Este monorepositorio  contiene la solución al reto técnico para Desarrollador 
 
 El reto propone la implementación de un microservicio el cual actúa como el punto de entrada principal para las estadísticas de interacción con usuarios. Su responsabilidad es recibir, validar y procesar estos datos de forma reactiva y asíncrona. La integridad de los datos se asegura mediante la validación de un hash MD5.
 
+La solución emplea un stack tecnológico moderno, incluyendo Spring WebFlux para la gestión de peticiones no bloqueantes, DynamoDB para la persistencia NoSQL y RabbitMQ para la publicación de eventos. El diseño se adhiere estrictamente a los principios de Clean Architecture, lo que resulta en un código desacoplado, mantenible y altamente escalable.
+
 ###  Prerequisitos
 - Java 17 o superior
 - Docker y Docker Compose
@@ -109,6 +111,15 @@ curl --location --request POST 'http://localhost:8080/api/customer-stats' \
 ```
 
 ##### Respuesta esperada: 400 Bad Request
+
+```json
+{
+    "error": {
+        "message": "Something went wrong. Please try again.",
+        "technicalMessage": "Invalid hash: hash_incorrecto"
+    }
+}
+```
 
 ### Ejecución de Pruebas
 Para ejecutar el conjunto completo de pruebas (unitarias y de integración), utiliza el siguiente comando de Gradle:
