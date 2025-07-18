@@ -5,8 +5,8 @@ services:
   ms-customer-stats-app:
     image: ms-customer-stats:latest
     build:
-      context: ./deployment # El contexto es el directorio actual (ms-customer-stats)
-      dockerfile: Dockerfile # El nombre del Dockerfile a usar
+      context: . # El contexto es el directorio actual (ms-customer-stats)
+      dockerfile: deployment/Dockerfile # El nombre del Dockerfile a usar
     container_name: ms-customer-stats-app
     ports:
       - "8080:8080" # Mapea el puerto de la app a tu máquina local
