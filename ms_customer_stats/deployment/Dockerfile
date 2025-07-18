@@ -1,6 +1,6 @@
 FROM eclipse-temurin:17-jdk-alpine
 VOLUME /tmp
-COPY --from=builder /app/build/libs/*.jar ms_customer_stats.jar
+COPY build/libs/*.jar ms_customer_stats.jar
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 ENV JAVA_OPTS=" -Xshareclasses:name=cacheapp,cacheDir=/cache,nonfatal -XX:+UseContainerSupport -XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom"
 # Replace with a non-root user to avoid running the container with excessive privileges
